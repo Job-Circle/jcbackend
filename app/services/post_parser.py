@@ -2,6 +2,17 @@ import re
 
 
 def extract_contact_info(text):
+    """
+    Add text passage.
+
+    Parameters
+    ----------
+    text: string
+
+    Returns
+    -------
+    list with 'phone number(s)' and 'email(s)'
+    """
     phone_patterns = [
         r"[\d٠-٩]{11}",  # Matches 11 digits (ASCII or Arabic)
         r"\W2[\d٠-٩]{11}",  # Matches a non-word character, then '2', then 11 digits
@@ -15,5 +26,5 @@ def extract_contact_info(text):
     email_pattern = r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"
     matches_email = []
     matches_email.extend(re.findall(email_pattern, text))
-    contact = [matches_phone, matches_email]
+    contact = {"mobile": matches_phone, "email": matches_email}
     return contact
