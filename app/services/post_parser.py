@@ -1,9 +1,35 @@
+import json
+import os
 import re
+import unicodedata
+
+
+def obtain_read_file():
+    global read_file_name
+    global downloads_path
+    # Get the path to the Downloads directory
+    downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+
+    # Ask the user to input the filename
+    read_file_name = input("Enter the name of the file in the Downloads folder: ")
+
+    # Construct the full path to the file
+    file_path = os.path.join(downloads_path, read_file_name)
+
+    # Try to open the file and read its content
+    try:
+        with open(file_path, "r") as myfile:
+            content = myfile.read()
+        return content
+    except FileNotFoundError:
+        return f"File '{read_file_name}' not found in the Downloads folder."
+    except Exception as e:
+        return f"An error occurred: {e}"
 
 
 def extract_contact_info(text):
     """
-    Add text passage.
+    Extract phone numbers and emails from text.
 
     Parameters
     ----------
@@ -11,7 +37,7 @@ def extract_contact_info(text):
 
     Returns
     -------
-    dictionary with 'phone number(s)' and 'email(s)'
+    dictionary with 'mobile' and 'email'
     """
     phone_patterns = [
         r"[\d٠-٩]{11}",  # Matches 11 digits (ASCII or Arabic)
@@ -30,42 +56,75 @@ def extract_contact_info(text):
     return contact
 
 
-def seperate_posts_from_whatsapp_bulk_text(bulk):
-    """
-    Add WhatApp text bulk.
+def decode_unicode_text(text):
+    return unicodedata.normalize("NFKD", text)
 
-    Parameters
-    ----------
-    bulk: string
 
-    Returns
-    -------
-    list (of strings) containing each message as an element excluding
-    repeated format
-
-    Example
-    -------
-    ['message 1',
-    'message 2',
-    'message 3']
-    """
-    # These patterns extract the message right after the repeated format exclusively
-    unsaved_ctc_sep_pat = (
-        r"\[.*?\] \+\d+ \d{2} \d{7}:\s*(.*)"  # Unsaved Contact Seperator Pattern
+def seperate_posts_from_whatsapp_bulk_text(input_string):
+    pattern = re.compile(
+        r"\[(1[0-2]|0?[1-9]):([0-5][0-9])\s?(AM|PM|am|pm),\s?(\d{2}/\d{2}/\d{4})\]\s(\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,4}):\s?((?:.|\n)*?)(?=\[\d{1,2}:\d{2}\s?(?:AM|PM|am|pm),|\Z)",
+        re.UNICODE,
     )
 
-    saved_ctc_sep_pat = r"\[.*?\] .*?, .*?:\s*(.*)"  # Saved Contact Seperator Pattern
-    ctc_sep_pat = [
-        unsaved_ctc_sep_pat,
-        saved_ctc_sep_pat,
-    ]  # Merge between both patterns
+    matches = pattern.findall(input_string)
+    results = []
 
-    extracted_message = []  # Emtpy list to store the actual messages
+    if not matches:
+        return json.dumps(
+            {"error": "Input string does not match the criteria"}, indent=4
+        )
 
-    # For Loop done for each pattern saved and unsaved seperators
-    for pattern in ctc_sep_pat:
-        matches = re.findall(pattern, bulk)  # Put all matches in a list
-        for match in matches:
-            extracted_message.append(match)
-            # Stores all list elements in 'extracted_message' list
-    return extracted_message
+    for match in matches:
+        time = f"{match[0]}:{match[1]} {match[2]}"
+        date_time = f"{time}, {match[3]}"
+        phone_number = match[4]
+        free_text = decode_unicode_text(
+            match[5].strip()
+        )  # Ensure blank free text is handled correctly and decode
+        result = {
+            "Date-Time": date_time,
+            "Phone Number": phone_number,
+            "Free Text": free_text,
+        }
+        results.append(result)
+
+    return results
+
+
+# Calling the function
+def extract_post_full_info_from_whatsapp_bulk_text():
+    python_output = seperate_posts_from_whatsapp_bulk_text(obtain_read_file())
+    result = []
+    for entry in python_output:
+        text_message = entry["Free Text"]
+        contact_info = extract_contact_info(text_message)
+        combined_entry = {**entry, **contact_info}  # Combine the two dictionaries
+        result.append(combined_entry)
+
+    # print(json.dumps(result, indent=2))
+    end_result = json.dumps(result, ensure_ascii=False, indent=2)
+    end_result = end_result.replace("\\n", "\n")
+    return end_result
+
+
+def write_parsed_messages_to_file():
+
+    content = extract_post_full_info_from_whatsapp_bulk_text()
+    # Define the filename
+    filename = f"{read_file_name}_parsed_messages.txt"
+
+    # Construct the full path to the file
+    file_path = os.path.join(downloads_path, filename)
+
+    # Call the extract_post_full_info_from_whatsapp_bulk_text function
+
+    # Try to write the content to the file
+    try:
+        with open(file_path, "w") as file:
+            file.write(content)
+        print(f"Content successfully written to {file_path}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+write_parsed_messages_to_file()
