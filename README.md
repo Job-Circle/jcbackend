@@ -31,7 +31,7 @@ Follow these steps to install MongoDB on your Windows machine using the `mongo_i
 3. **Add MongoDB Bin Directory:**
    - Click on **New** and add the following path (adjust based on your MongoDB installation directory):
      ```
-     C:\MongoDB\mongodb-win32-x86_64-windows-6.0.15\bin
+     C:\MongoDB\mongodb-win32-x86_64-windows-5.0.27\bin
      ```
    - Click **OK** to save the changes.
 
