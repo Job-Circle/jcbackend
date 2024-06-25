@@ -52,7 +52,7 @@ Follow these steps to install MongoDB on your Windows machine using the `mongo_i
    - Press **Enter**.
    - You should see output similar to:
      ```
-     MongoDB server version: 6.0.15
+     MongoDB server version:5.0.27
      ```
    - This confirms that MongoDB has been successfully installed and configured on your Windows system.
 
