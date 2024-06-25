@@ -4,7 +4,7 @@
 $installDir = "C:\MongoDB"
 
 # Download MongoDB
-Invoke-WebRequest -Uri "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-6.0.15.zip" -OutFile "$installDir\mongodb.zip"
+Invoke-WebRequest -Uri "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-5.0.27.zip" -OutFile "$installDir\mongodb.zip"
 
 # Extract MongoDB directly into the installation directory
 Expand-Archive -Path "$installDir\mongodb.zip" -DestinationPath $installDir
