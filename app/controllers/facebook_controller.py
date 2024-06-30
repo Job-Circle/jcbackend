@@ -56,7 +56,7 @@ def postToFacebook(post):
             except TimeoutException:
                 print("Neither of the elements was found.")
         # Finds the post button element to create a post
-
+        
         WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, '[aria-label="Post"]'))
         ).click()
