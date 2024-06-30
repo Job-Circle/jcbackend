@@ -19,5 +19,5 @@ from django.urls import path
 from orchestrators.posts_orchestrator import createPost
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('posts', createPost, name='createPosts'),
+    path('posts', createPost, name='createPost'),
 ]
