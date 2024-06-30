@@ -9,6 +9,8 @@ def createPost(request):
         failed = postToFacebook(post_data)
         if(not failed):
             addPostToDB(post_data)
+        else:
+            return JsonResponse({'message': 'Failed to create post!'}, status=500)
         return JsonResponse({'message': 'Post created successfully!'})
     else:
         return JsonResponse({'message': 'Invalid request method!'}, status=405)
