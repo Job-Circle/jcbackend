@@ -17,6 +17,10 @@ This document provides the steps to set up and run the Django backend.
 ## Prerequisites
 
 - Python installed on your machine
+- If installed, make sure it's updated
+  ```
+  python -m pip install --upgrade pip
+  ```
 - Pip (Python package installer) installed
 
 ## Steps to Set Up and Run the Backend
