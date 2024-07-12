@@ -69,7 +69,7 @@ def seperate_posts_from_whatsapp_bulk_text(input_string):
 
 
 # Calling the function
-def extract_post_full_info_from_whatsapp_bulk_text(bulk_txt):
+def extract_post_full_info_from_whatsapp_bulk_text_json(bulk_txt):
     python_output = seperate_posts_from_whatsapp_bulk_text(bulk_txt)
     result = []
     for entry in python_output:
@@ -82,3 +82,19 @@ def extract_post_full_info_from_whatsapp_bulk_text(bulk_txt):
     end_result = json.dumps(result, ensure_ascii=False, indent=2)
     end_result = end_result.replace("\\n", "\n")
     return end_result
+
+
+def extract_post_full_info_from_whatsapp_bulk_text(bulk_txt):
+    python_output = seperate_posts_from_whatsapp_bulk_text(bulk_txt)
+    result = []
+    # print(python_output)
+    for entry in python_output:
+        text_message = entry["Free Text"]
+        contact_info = extract_contact_info(text_message)
+        combined_entry = {**entry, **contact_info}  # Combine the two dictionaries
+        result.append(combined_entry)
+
+    return result
+
+
+# extract_post_full_info_from_whatsapp_bulk_text_json("""""")
